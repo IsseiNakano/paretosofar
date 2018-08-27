@@ -15,7 +15,8 @@ class ParetoSolution {
     reset() ;
     int start = millis() ;
     negativeCycleCheck() ;
-    pareto[0].upd.add(new Vector(new int[objective])) ;
+    for(PathVec ps : pareto)
+      ps.updAddMinis() ;
     bellmanfordlayer() ;
     return millis() - start ;
   }
