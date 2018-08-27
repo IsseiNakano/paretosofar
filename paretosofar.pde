@@ -11,7 +11,7 @@ PathVec sss = new PathVec() ;
 
 void setup() {
   // dir = "../../data/" ;
-  int[] m = {0,1,2} ;
+  int[] m = {0,-1,2} ;
   ParetoSolution p = new ParetoSolution(m) ;
   p.update() ;
   exit() ;
