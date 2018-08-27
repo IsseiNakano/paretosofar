@@ -1,4 +1,3 @@
-
 class Vector {
   int[] pathweight ;
   Vector pre ;
@@ -58,14 +57,12 @@ class Vector {
     return true ;
   }
 }
-
-class PathVec {
+ class PathVec {
   Vector dummy ;
   int index ;
   int[][] w ;
   Vector upd ;
   Vector vs ;
-  int mini ;
   PathVec() {
   }
   PathVec(int i, int[][] wei) {
@@ -111,22 +108,5 @@ class PathVec {
     dummy.clear() ;
     upd.clear() ;
     vs.clear() ;
-  }
-  boolean negativeCycleCheck(PathVec pps, int k) {
-    if(mini > pps.mini + w[pps.index][k]) {
-      mini = pps.mini + w[pps.index][k] ;
-      return true ;
-    }
-    return false ;
-  }
-  void removeObject(int k) {
-    for(int i = 0 ; i < w.length ; i++)
-      w[i][k] = 0 ;
-  }
-  void miniZero() {
-    mini = 0 ;
-  }
-  void miniClear() {
-    mini = maxint ;
   }
 }
