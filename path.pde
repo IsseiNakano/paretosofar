@@ -1,92 +1,135 @@
 class Vector {
-  int[] values ;
-  Vector pred ;
-  Vector succ ;
+  int[] pathweight ;
+  Vector pre ;
+  Vector follow ;
   Vector() {
+    pre = this ;
+    follow = this ;
   }
-  Vector(int[] v) {
-    values = v ;
+  Vector(int[] weight) {
+    pathweight = weight ;
   }
-  int[] add(int[] w) {
-    int[] v = new int[objectiveNum] ;
-    for (int k = 0 ; k < objectiveNum ; k++) {
-      v[k] = values[k] + w[k] ;
-    }
-    return v ;
+  void add(Vector a) {
+    a.pre = this ;
+    follow.pre = a ;
+    a.follow = follow ;
+    follow = a ;
+  }
+  void remove() {
+    pre.follow = follow ;
+    follow.pre = pre ;
+  }
+  void clear() {
+    pre = this ;
+    follow = this ;
+  }
+  boolean isEmpty(){
+    return follow == this ;
+  }
+  void addAll(Vector a, Vector b) {
+    pre.follow = a ;
+    a.pre = pre ;
+    pre = b ;
+    b.follow = this ;
+  }
+  int[] calculation(int[] weight) {
+    int[] value = new int[objective];
+    for(int i = 0 ; i < objective ; i++)
+      value[i] = pathweight[i] + weight[i] ;
+    return value ;
   }
   int dominate(int[] u) {
     int status = 0 ;
-    for (int k = 0 ; k < objectiveNum ; k++) {
-      int d = u[k] - values[k] ;
+    for (int k = 0 ; k < objective ; k++) {
+      int d = u[k] - pathweight[k] ;
       if (d > 0) status |= 1 ;
       else if (d < 0) status |= 2 ;
       if (status == 3) break ;
     }
     return status ;
   }
-  void remove() {
-    pred.succ = succ ;
-    succ.pred = pred ;
-  }
-  String toString() {
-    return join(nf(values, 0), ", ") ;
+  boolean check(int[] u) {
+    for (Vector v = follow ; v != this ; v = v.follow) {
+      int status = v.dominate(u) ;
+      if (status <= 1) return false ;
+      if (status == 2) v.remove() ;
+    }
+    return true ;
   }
 }
 
-class VectorSet {
-  Vector head ;
-  Vector anker ;
-  VectorSet() {
-    head = new Vector() ;
-    reset() ;
+class PathVec {
+  Vector dummy ;
+  int index ;
+  int[][] w ;
+  Vector upd ;
+  Vector vs ;
+  int mini ;
+  PathVec minipre ;
+  PathVec() {
   }
-  void reset() {
-    head.pred = head.succ = head ;
-    fixedAll() ;
+  PathVec(int i, int[][] wei) {
+    index = i ;
+    w = wei ;
+    dummy = new Vector() ;
+    upd = new Vector() ;
+    vs = new Vector() ;
+    minipre = sss ;
   }
-  void fixedAll() {
-    anker = head.pred ;
+  void add(int[] wei) {
+    dummy.pre.add(new Vector(wei)) ;
   }
-  void insert(int[] u) {
-    Vector vu = new Vector(u) ;
-    vu.pred = head.pred ;
-    vu.succ = head ;
-    vu.pred.succ = head.pred = vu ;
-  }
-  void remove(Vector v) {
-    v.remove() ;
-    if (v == anker) anker = v.pred ;
-  }
-  int size() {
-    int total = 0 ;
-    for (Vector u = head.succ ; u != head ; u = u.succ)
-    total++ ;
-    return total ;
-  }
-  boolean update(VectorSet vs, int[] w) {
+  boolean paretoConstruction(PathVec pps) {
     boolean flag = false ;
-    for (Vector u = anker.succ ; u != head ; u = u.succ) {
-      if (vs.insertTest(u.add(w))) flag = true ;
+    for(Vector s = pps.upd.follow ; s != pps.upd ; s = s.follow) {
+      int[] path = s.calculation(w[pps.index]) ;
+      if (dummy.check(path))
+      if (upd.check(path))
+      if (vs.check(path)) {
+        vs.add(new Vector(path)) ;
+        flag = true ;
+      }
     }
     return flag ;
   }
-  boolean insertTest(int[] v) {
-    if (! check(v)) return false ;
-    insert(v) ;
-    return true ;
+  int leng() {
+    int count = 0 ;
+    for(Vector s = dummy.follow ; s != dummy ; s = s.follow)
+      count++ ;
+    return count ;
   }
-  boolean check(int[] u) {
-    for (Vector v = head.succ ; v != head ; v = v.succ) {
-      int status = v.dominate(u) ;
-      if (status <= 1) return false ;
-      if (status < 3) remove(v) ;
+  void update() {
+    if(!upd.isEmpty()) {
+      dummy.addAll(upd.follow, upd.pre) ;
+      upd.clear() ;
     }
-    return true ;
+    if(!vs.isEmpty()) {
+      upd.addAll(vs.follow, vs.pre) ;
+      vs.clear() ;
+    }
   }
-  String toString() {
-    String stg = "" ;
-    for (Vector v = head.succ ; v != head ; v = v.succ)
-    stg += v + "\n" ;
-    return stg + "\n" ;
+  void reset() {
+    dummy.clear() ;
+    upd.clear() ;
+    vs.clear() ;
+  }
+  int negativeCycleCheck(PathVec pps, int k) {
+    if(mini > pps.mini + w[pps.index][k]) {
+      mini = pps.mini + w[pps.index][k] ;
+      if(minipre == pps) return 3 ;
+      minipre = pps ;
+      return 2 ;
+    }
+    return 1 ;
+  }
+  void removeObject(int k) {
+    for(int i = 0 ; i < w.length ; i++)
+      w[i][k] = 0 ;
+  }
+  void miniZero() {
+    mini = 0 ;
+  }
+  void miniClear() {
+    mini = maxint ;
   }
 }

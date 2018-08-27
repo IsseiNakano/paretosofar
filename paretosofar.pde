@@ -1,27 +1,18 @@
-// String dir = "../../../../data/" ;
+// 完全グラフのためグラフを使用していない（頂点はint:頂点数nの時０ 〜 n-1）
 String dir = "/Users/nakano/Desktop/instanceData/" ;
-final int vertexNum = 500 ;
+String dirF = "/Users/nakano/Desktop/data500/" ;
+final int nodenum = 500 ;
 final int bound = 300 ;
-final int objectiveNum = 3 ;
+final int objective = 3 ;
+final int experimentNum = 10 ;
+final int maxint = 99999 ;
+boolean negativeobj[] = new boolean[objective] ;
+PathVec sss = new PathVec() ;
 
 void setup() {
+  // dir = "../../data/" ;
   int[] m = {0,1,2} ;
-  singleInstanceExperiment(m) ;
+  ParetoSolution p = new ParetoSolution(m) ;
+  p.update() ;
   exit() ;
-}
-
-void fullExperiment() {
-
-}
-
-void singleInstanceExperiment(int[] m) {
-  WeightInfo wi = new WeightInfo(dir, bound, m) ;
-  int time = Integer.MAX_VALUE ; ;
-
-  for (int i = 0 ; i < 10 ; i++) {
-    int times = wi.update() ;
-    time = min(time, times) ;
-    println(times) ;
-  }
-  println(wi.size() + "," + time) ;
 }
