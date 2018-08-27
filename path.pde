@@ -1,112 +1,92 @@
 class Vector {
-  int[] pathweight ;
-  Vector pre ;
-  Vector follow ;
+  int[] values ;
+  Vector pred ;
+  Vector succ ;
   Vector() {
-    pre = this ;
-    follow = this ;
   }
-  Vector(int[] weight) {
-    pathweight = weight ;
+  Vector(int[] v) {
+    values = v ;
   }
-  void add(Vector a) {
-    a.pre = this ;
-    follow.pre = a ;
-    a.follow = follow ;
-    follow = a ;
-  }
-  void remove() {
-    pre.follow = follow ;
-    follow.pre = pre ;
-  }
-  void clear() {
-    pre = this ;
-    follow = this ;
-  }
-  boolean isEmpty(){
-    return follow == this ;
-  }
-  void addAll(Vector a, Vector b) {
-    pre.follow = a ;
-    a.pre = pre ;
-    pre = b ;
-    b.follow = this ;
-  }
-  int[] calculation(int[] weight) {
-    int[] value = new int[objective];
-    for(int i = 0 ; i < objective ; i++)
-      value[i] = pathweight[i] + weight[i] ;
-    return value ;
+  int[] add(int[] w) {
+    int[] v = new int[objectiveNum] ;
+    for (int k = 0 ; k < objectiveNum ; k++) {
+      v[k] = values[k] + w[k] ;
+    }
+    return v ;
   }
   int dominate(int[] u) {
     int status = 0 ;
-    for (int k = 0 ; k < objective ; k++) {
-      int d = u[k] - pathweight[k] ;
+    for (int k = 0 ; k < objectiveNum ; k++) {
+      int d = u[k] - values[k] ;
       if (d > 0) status |= 1 ;
       else if (d < 0) status |= 2 ;
       if (status == 3) break ;
     }
     return status ;
   }
-  boolean check(int[] u) {
-    for (Vector v = follow ; v != this ; v = v.follow) {
-      int status = v.dominate(u) ;
-      if (status <= 1) return false ;
-      if (status == 2) v.remove() ;
-    }
-    return true ;
+  void remove() {
+    pred.succ = succ ;
+    succ.pred = pred ;
+  }
+  String toString() {
+    return join(nf(values, 0), ", ") ;
   }
 }
- class PathVec {
-  Vector dummy ;
-  int index ;
-  int[][] w ;
-  Vector upd ;
-  Vector vs ;
-  PathVec() {
+
+class VectorSet {
+  Vector head ;
+  Vector anker ;
+  VectorSet() {
+    head = new Vector() ;
+    reset() ;
   }
-  PathVec(int i, int[][] wei) {
-    index = i ;
-    w = wei ;
-    dummy = new Vector() ;
-    upd = new Vector() ;
-    vs = new Vector() ;
+  void reset() {
+    head.pred = head.succ = head ;
+    fixedAll() ;
   }
-  void add(int[] wei) {
-    dummy.pre.add(new Vector(wei)) ;
+  void fixedAll() {
+    anker = head.pred ;
   }
-  boolean paretoConstruction(PathVec pps) {
+  void insert(int[] u) {
+    Vector vu = new Vector(u) ;
+    vu.pred = head.pred ;
+    vu.succ = head ;
+    vu.pred.succ = head.pred = vu ;
+  }
+  void remove(Vector v) {
+    v.remove() ;
+    if (v == anker) anker = v.pred ;
+  }
+  int size() {
+    int total = 0 ;
+    for (Vector u = head.succ ; u != head ; u = u.succ)
+    total++ ;
+    return total ;
+  }
+  boolean update(VectorSet vs, int[] w) {
     boolean flag = false ;
-    for(Vector s = pps.upd.follow ; s != pps.upd ; s = s.follow) {
-      int[] path = s.calculation(w[pps.index]) ;
-      if (dummy.check(path))
-      if (upd.check(path))
-      if (vs.check(path)) {
-        vs.add(new Vector(path)) ;
-        flag = true ;
-      }
+    for (Vector u = anker.succ ; u != head ; u = u.succ) {
+      if (vs.insertTest(u.add(w))) flag = true ;
     }
     return flag ;
   }
-  int leng() {
-    int count = 0 ;
-    for(Vector s = dummy.follow ; s != dummy ; s = s.follow)
-      count++ ;
-    return count ;
+  boolean insertTest(int[] v) {
+    if (! check(v)) return false ;
+    insert(v) ;
+    return true ;
   }
-  void update() {
-    if(!upd.isEmpty()) {
-      dummy.addAll(upd.follow, upd.pre) ;
-      upd.clear() ;
+  boolean check(int[] u) {
+    for (Vector v = head.succ ; v != head ; v = v.succ) {
+      int status = v.dominate(u) ;
+      if (status <= 1) return false ;
+      if (status < 3) remove(v) ;
     }
-    if(!vs.isEmpty()) {
-      upd.addAll(vs.follow, vs.pre) ;
-      vs.clear() ;
-    }
+    return true ;
   }
-  void reset() {
-    dummy.clear() ;
-    upd.clear() ;
-    vs.clear() ;
+  String toString() {
+    String stg = "" ;
+    for (Vector v = head.succ ; v != head ; v = v.succ)
+    stg += v + "\n" ;
+    return stg + "\n" ;
   }
 }

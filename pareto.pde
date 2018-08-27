@@ -1,83 +1,50 @@
-class ParetoSolution {
+class WeightInfo {
   int[][][] weight ;
-  PathVec[] pareto ;
-   ParetoSolution(int[] m) {
-    weight = instanceText(m) ;
-    // weight = randomWeight() ;
-    pareto = new PathVec[nodenum] ;
-    for(int j = 0 ; j < nodenum ; j++)  pareto[j] = new PathVec(j, weight[j]) ;
-  }
-   int bellmanford() {
-    reset() ;
-    int start = millis() ;
-    pareto[0].upd.add(new Vector(new int[objective])) ;
-    boolean flag = true ;
-    while(flag) {
-      flag = false ;
-      for(PathVec ps : pareto)
-        for(PathVec pps : pareto)
-          if(ps.index != pps.index)
-          if(ps.paretoConstruction(pps)) flag = true ;
-      for(PathVec ps : pareto)
-        ps.update() ;
+  VectorSet[] labels ;
+  WeightInfo(String dir, int b, int[] m) {
+    weight = new int[vertexNum][vertexNum][objectiveNum] ;
+    for (int k = 0 ; k < m.length ; k++) {
+      String[] lines = loadStrings(dir + "weight_" + vertexNum + "_" + b + "_" + m[k] + ".csv") ;
+      for (int i = 0 ; i < vertexNum ; i++) {
+        int[] data = int(float(split(lines[i], ","))) ;
+        for (int j = 0 ; j < vertexNum ; j++) {
+          weight[i][j][k] = data[j] ;
+        }
+      }
     }
-    return millis() - start ;
+    labels = new VectorSet[vertexNum] ;
+    for (int i = 0 ; i < vertexNum ; i++) {
+      labels[i] = new VectorSet() ;
+    }
   }
-   void reset() {
-    for (PathVec vs : pareto) {
+  void reset() {
+    for (VectorSet vs : labels) {
       vs.reset() ;
     }
   }
-   void update() {
-    int time = Integer.MAX_VALUE ; ;
-    for(int i = 0 ; i < experimentNum ; i++) {
-      int times = bellmanford() ;
-      time = min(time, times) ;
-      println(times) ;
-    }
-    println(leng()+","+time) ;
+  int size() {
+    int total = 0 ;
+    for (VectorSet vs : labels)
+    total += vs.size() ;
+    return total ;
   }
-   int leng() {
-    int count = 0 ;
-    for(PathVec ps : pareto)
-     count += ps.leng() ;
-    return count ;
-  }
-   int[][][] instanceText(int[] m) {
-    int[][][] weight = new int[nodenum][nodenum][objective] ;
-    for (int k = 0 ; k < m.length ; k++) {
-      String[] lines = loadStrings(dir + "weight_" + nodenum + "_" + bound + "_" + m[k] + ".csv");
-      for(int i = 0 ; i < nodenum ; i++){
-        String[] values = split(lines[i], ",") ;
-        for(int j = 0 ; j < nodenum ; j++) {
-          weight[j][i][k] = int(values[j]) ;
+  int update() {
+    reset() ;
+    int time = millis() ;
+    labels[0].insert(new int[objectiveNum]) ;
+    while (true) {
+      boolean stable = true ;
+      for (int i = 0 ; i < vertexNum ; i++) {
+        VectorSet li = labels[i] ;
+        if (li.anker.succ == li.head) continue ;
+        for (int j = 0 ; j < vertexNum ; j++) {
+          if (j == i) continue ;
+          if (li.update(labels[j], weight[i][j])) stable = false ;
         }
+        li.fixedAll() ;
       }
+      if (stable) break ;
     }
-    return weight ;
+    return millis() - time ;
   }
-   int[][][] instanceTextF(int[] m) {
-    int[][][] weight = new int[nodenum][nodenum][objective] ;
-    for (int k = 0 ; k < m.length ; k++) {
-      String[] lines = loadStrings(dirF + "cost" + m[k] + ".csv");
-      for(int i = 0 ; i < nodenum ; i++){
-        String[] values = split(lines[i], ",") ;
-        for(int j = 0 ; j < nodenum ; j++) {
-          weight[j][i][k] = int(values[j]) ;
-        }
-      }
-    }
-    return weight ;
-  }
-   int[][][] randomWeight() {
-    int[][][] weight = new int[nodenum][nodenum][objective] ;
-    for (int k = 0 ; k < nodenum ; k++) {
-      for(int i = 0 ; i < nodenum ; i++){
-        for(int j = 0 ; j < objective; j++) {
-          weight[k][i][j] = int(random(bound)) ;
-        }
-      }
-    }
-    return weight ;
-  }
- }
+}
