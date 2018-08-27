@@ -1,21 +1,14 @@
+
 class Vector {
   int[] pathweight ;
   Vector pre ;
   Vector follow ;
-  int prenode ;
-  Vector nodevec ;
   Vector() {
     pre = this ;
     follow = this ;
   }
-  Vector(int[] weight, int node) {
+  Vector(int[] weight) {
     pathweight = weight ;
-    prenode = node ;
-  }
-  Vector(int[] weight, int node, Vector vec) {
-    pathweight = weight ;
-    prenode = node ;
-    nodevec = vec ;
   }
   void add(Vector a) {
     a.pre = this ;
@@ -64,21 +57,15 @@ class Vector {
     }
     return true ;
   }
-  void removeObject(int k) {
-    for (Vector v = follow ; v != this ; v = v.follow)
-      v.pathweight[k] = 0 ;
-  }
-  void removeObject(Vector k) {
-    for (Vector v = follow ; v != this ; v = v.follow)
-      k.check(v.pathweight) ;
-  }
 }
- class PathVec {
+
+class PathVec {
   Vector dummy ;
   int index ;
   int[][] w ;
   Vector upd ;
   Vector vs ;
+  int mini ;
   PathVec() {
   }
   PathVec(int i, int[][] wei) {
@@ -88,34 +75,20 @@ class Vector {
     upd = new Vector() ;
     vs = new Vector() ;
   }
+  void add(int[] wei) {
+    dummy.pre.add(new Vector(wei)) ;
+  }
   boolean paretoConstruction(PathVec pps) {
     boolean flag = false ;
     for(Vector s = pps.upd.follow ; s != pps.upd ; s = s.follow) {
       int[] path = s.calculation(w[pps.index]) ;
-      if(check(path))
-        if(negativeCheck(path, pps.index, s)) {
-          vs.add(new Vector(path, pps.index, s)) ;
-          flag = true ;
-        }
-    }
-    return flag ;
-  }
-  boolean check(int[] path) {
-    if (dummy.check(path))
+      if (dummy.check(path))
       if (upd.check(path))
-        if (vs.check(path))
-          return true ;
-    return false ;
-  }
-  boolean negativeCheck(int[] path, int ppsindex, Vector s) {
-    boolean flag = true ;
-    for(Vector v = s ; v.prenode != -1 ; v = v.nodevec)
-      if(v.prenode == ppsindex)
-        for(int i = 0 ; i < objective ; i++)
-          if(v.pathweight[i] > path[i]) {
-            negativeobj[i] = true ;
-            flag = false ;
-          }
+      if (vs.check(path)) {
+        vs.add(new Vector(path)) ;
+        flag = true ;
+      }
+    }
     return flag ;
   }
   int leng() {
@@ -139,20 +112,21 @@ class Vector {
     upd.clear() ;
     vs.clear() ;
   }
+  boolean negativeCycleCheck(PathVec pps, int k) {
+    if(mini > pps.mini + w[pps.index][k]) {
+      mini = pps.mini + w[pps.index][k] ;
+      return true ;
+    }
+    return false ;
+  }
   void removeObject(int k) {
     for(int i = 0 ; i < w.length ; i++)
       w[i][k] = 0 ;
-    dummy.removeObject(k) ;
-    upd.removeObject(k) ;
-    vs.removeObject(k) ;
-    removeObject() ;
   }
-  void removeObject() {
-    dummy.removeObject(upd) ;
-    dummy.removeObject(vs) ;
-    upd.removeObject(dummy) ;
-    upd.removeObject(vs) ;
-    vs.removeObject(dummy) ;
-    vs.removeObject(upd) ;
+  void miniZero() {
+    mini = 0 ;
+  }
+  void miniClear() {
+    mini = maxint ;
   }
 }
