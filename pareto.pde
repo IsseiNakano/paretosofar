@@ -159,5 +159,4 @@ class ParetoSolution {
     }
     return weight ;
   }
-
 }

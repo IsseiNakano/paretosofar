@@ -152,6 +152,21 @@ class PathVec {
       minipre = pps ;
       return 2 ;
     }
+    if(mini[k] == pps.mini[k] + w[pps.index][k]) {
+      for(int i = 0 ; i < objective ; i++) {
+        if(mini[i] > pps.mini[i] + w[pps.index][i]) {
+          int[] value = new int[objective];
+          for(int j = 0 ; j < objective ; j++)
+            value[j] = pps.mini[j] + w[pps.index][j] ;
+          mini = value ;
+          if(minipre == pps) return 3 ;
+          minipre = pps ;
+          return 2 ;
+        } else if (mini[i] < pps.mini[i] + w[pps.index][i]) {
+          return 1 ;
+        }
+      }
+    }
     return 1 ;
   }
   void removeObject(int k) {
