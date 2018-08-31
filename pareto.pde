@@ -99,7 +99,7 @@ class ParetoSolution {
       time = min(time, times) ;
       println(times) ;
     }
-    println(leng()+","+time) ;
+    println(leng()+","+time+","+solutionin) ;
   }
 
   int leng() {
