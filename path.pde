@@ -109,7 +109,7 @@ class PathVec {
     boolean flag = false ;
     for(Vector s = pps.upd.follow ; s != pps.upd ; s = s.follow) {
       int[] path = s.calculation(w[pps.index]) ;
-      // if (minis.domi(path))
+      if (minis.domi(path))
       if (dummy.check(path))
       if (upd.check(path))
       if (vs.check(path)) {
