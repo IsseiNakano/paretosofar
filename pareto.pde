@@ -1,28 +1,16 @@
 class ParetoSolution {
   int[][][] weight ;
   PathVec[] pareto ;
-  int[] mm ;
-
-  ParetoSolution(int[] m) {
+   ParetoSolution(int[] m) {
     weight = instanceText(m) ;
-    mm = m ;
     // weight = randomWeight() ;
     pareto = new PathVec[nodenum] ;
     for(int j = 0 ; j < nodenum ; j++)  pareto[j] = new PathVec(j, weight[j]) ;
   }
-
-  int bellmanford() {
+   int bellmanford() {
     reset() ;
     int start = millis() ;
-    negativeCycleCheck() ;
     pareto[0].upd.add(new Vector(new int[objective])) ;
-    // for(PathVec ps : pareto)
-    //   ps.updAddMinis() ;
-    bellmanfordlayer() ;
-    return millis() - start ;
-  }
-
-  void bellmanfordlayer() {
     boolean flag = true ;
     while(flag) {
       flag = false ;
@@ -33,95 +21,29 @@ class ParetoSolution {
       for(PathVec ps : pareto)
         ps.update() ;
     }
+    return millis() - start ;
   }
-
-  boolean negativeCycleCheck(int k) {
-    int status ;
-    for(PathVec ps : pareto) {
-      ps.miniClear() ;
-      ps.minipre = sss ;
-    }
-    pareto[0].miniZero() ;
-    for(int i = 0 ; i < nodenum ; i++) {
-      boolean flag = false ;
-      for(PathVec ps : pareto)
-        for(PathVec pps : pareto)
-          if(ps.index != pps.index) {
-            status = ps.negativeCycleCheck(pps, k) ;
-            if(status == 3)
-              if(cycleCheck(pps, pps.index)) return false ;
-            if(status > 1) flag = true ;
-          }
-      if(!flag) return true ;
-    }
-    return false ;
-  }
-
-  boolean cycleCheck(PathVec x, int y) {
-    for(PathVec i = x.minipre ; i != sss ; i = i.minipre) {
-      if(i.index == y) return true ;
-    }
-    return false ;
-  }
-
-  void negativeCycleCheck() {
-    for(int i = 0 ; i < objective ; i++) {
-      if(!negativeCycleCheck(i)) {
-        removeObject(i) ;
-      } else {
-        conversion() ;
-      }
-    }
-  }
-
-  void conversion() {
-    for(PathVec ps : pareto)
-      ps.conversion() ;
-  }
-
-  void removeObject(int k) {
-    for(PathVec ps : pareto)
-      ps.removeObject(k) ;
-  }
-
-  void reset() {
+   void reset() {
     for (PathVec vs : pareto) {
       vs.reset() ;
     }
-    weight = instanceText(mm) ;
-    for(int j = 0 ; j < nodenum ; j++)  pareto[j].w = weight[j] ;
   }
-
-  void update() {
+   void update() {
     int time = Integer.MAX_VALUE ; ;
     for(int i = 0 ; i < experimentNum ; i++) {
       int times = bellmanford() ;
       time = min(time, times) ;
       println(times) ;
     }
-    println(leng()+","+time+","+solutionin) ;
+    println(leng()+","+time) ;
   }
-
-  int leng() {
+   int leng() {
     int count = 0 ;
     for(PathVec ps : pareto)
      count += ps.leng() ;
     return count ;
   }
-
-  int minileng() {
-    int count = 0 ;
-    for(PathVec ps : pareto)
-     count += ps.minileng() ;
-    return count ;
-  }
-
-  void minishow() {
-    for(PathVec ps : pareto)
-      ps.minishow() ;
-  }
-
-  int[][][] instanceText(int[] m) {
+   int[][][] instanceText(int[] m) {
     int[][][] weight = new int[nodenum][nodenum][objective] ;
     for (int k = 0 ; k < m.length ; k++) {
       String[] lines = loadStrings(dir + "weight_" + nodenum + "_" + bound + "_" + m[k] + ".csv");
@@ -134,8 +56,7 @@ class ParetoSolution {
     }
     return weight ;
   }
-
-  int[][][] instanceTextF(int[] m) {
+   int[][][] instanceTextF(int[] m) {
     int[][][] weight = new int[nodenum][nodenum][objective] ;
     for (int k = 0 ; k < m.length ; k++) {
       String[] lines = loadStrings(dirF + "cost" + m[k] + ".csv");
@@ -148,8 +69,7 @@ class ParetoSolution {
     }
     return weight ;
   }
-
-  int[][][] randomWeight() {
+   int[][][] randomWeight() {
     int[][][] weight = new int[nodenum][nodenum][objective] ;
     for (int k = 0 ; k < nodenum ; k++) {
       for(int i = 0 ; i < nodenum ; i++){
@@ -160,4 +80,4 @@ class ParetoSolution {
     }
     return weight ;
   }
-}
+ }

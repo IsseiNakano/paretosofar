@@ -7,10 +7,6 @@ final int objective = 3 ;
 final int experimentNum = 10 ;
 final int maxint = 99999 ;
 boolean negativeobj[] = new boolean[objective] ;
-PathVec sss = new PathVec() ;
-
-int solutionin = 0 ;
-int solutionout = 0 ;
 
 void setup() {
   // dir = "../../data/" ;
